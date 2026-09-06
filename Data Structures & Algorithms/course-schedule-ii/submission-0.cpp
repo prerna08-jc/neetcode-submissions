@@ -1,0 +1,61 @@
+class Solution {
+public:
+    bool iscycle(int src,vector<bool>&vis,vector<bool>& recPath, vector<vector<int>>& edges){
+        vis[src]=true;
+        recPath[src]=true;
+        for(int i=0;i<edges.size();i++){
+            int v=edges[i][0];
+            int u=edges[i][1];
+            if(u==src){
+                if(!vis[v]){
+                    if(iscycle(v,vis,recPath,edges)){
+                        return true;
+                    }
+                }
+                else if(recPath[v]){
+                    return true;  // back edge -> cycle
+                }
+            }
+        }
+        recPath[src]=false;
+        return false;
+    }
+    void topo(int src,vector<bool>&vis,stack<int> &s, vector<vector<int>>& edges){
+        vis[src]=true;
+        for(int i=0;i<edges.size();i++){
+            int v=edges[i][0];
+            int u=edges[i][1];
+            if(u==src){
+                if(!vis[v]){
+                    topo(v,vis,s,edges);
+                }
+                
+            }
+        }
+        s.push(src);
+    }
+    vector<int> findOrder(int n, vector<vector<int>>& edges) {
+        vector<bool> vis(n,0);
+        vector<bool> recPath(n,0);
+        vector<int> ans;
+        for(int i=0;i<n;i++){
+            if(!vis[i]){
+                if(iscycle(i,vis,recPath,edges)){
+                    return ans;
+                }
+            }
+        }
+        stack<int> s;
+        vis.assign(n,0);
+        for(int i=0;i<n;i++){
+            if(!vis[i]){
+                topo(i,vis,s,edges);
+            }
+        }
+        while(s.size()>0){
+            ans.push_back(s.top());
+            s.pop();
+        }
+        return ans;
+    }
+};
